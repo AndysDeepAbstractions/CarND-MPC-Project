@@ -90,7 +90,13 @@ int main() {
           double px = j[1]["x"];
           double py = j[1]["y"];
           double psi = j[1]["psi"];
+
           double v = j[1]["speed"];
+          double delta = j[1]["steering_angle"];
+          const double Lf = 2.67;
+          const double dt = 0.1;
+
+          psi -= v * delta / Lf * dt;
 
           /*
           * TODO: Calculate steering angle and throttle using MPC.
@@ -159,7 +165,7 @@ int main() {
           //.. add (x,y) points to list here, points are in reference to the vehicle's coordinate system
           // the points in the simulator are connected by a Yellow line
 
-          for (double i = 0; i < vars.size()*2; i += 1){
+          for (double i = 0; i < vars.size(); i += 1){
             next_x_vals.push_back(i);
             next_y_vals.push_back(polyeval(coeffs, i));
           }
@@ -179,7 +185,7 @@ int main() {
           //
           // NOTE: REMEMBER TO SET THIS TO 100 MILLISECONDS BEFORE
           // SUBMITTING.
-          this_thread::sleep_for(chrono::milliseconds(0));
+          this_thread::sleep_for(chrono::milliseconds(100));
           ws.send(msg.data(), msg.length(), uWS::OpCode::TEXT);
         }
       } else {
