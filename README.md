@@ -26,7 +26,8 @@ The Elapsed Duration (dt) was increased to 0.1 to be equal to the introduced lat
 
 The Model was very sensitive to errors Phi so i added compensation for the error in Phi based on the introduced latancy to the model.
 
-```           psi -= v * delta / Lf * dt;
+```           
+		psi -= v * delta / Lf * dt;
 ```
 
 The speed was set to a reasonable value to drive savely.
