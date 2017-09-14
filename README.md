@@ -18,6 +18,14 @@ Self-Driving Car Engineer Nanodegree Program
 
 ## Timestep Length and Elapsed Duration (N & dt)
 
-Higher Timestep Length (N) and & lower Elapsed Duration (dt) are prferd for better results.
+Higher Timestep Length (N) and & lower Elapsed Duration (dt) are preferd for better results.
 The inital Timestep Length (N = 25) was reasonable for my PCs Performance.
 The Elapsed Duration (dt) was increased to 0.1 to be equal to the introduced latancy.
+
+## Model Predictive Control with Latency
+
+The Model was very sensitive to errors Phi so i added compensation for the error in Phi based on the introduced latancy to the model.
+
+`           psi -= v * delta / Lf * dt;
+
+The speed was set to a reasonable value to drive savely.
