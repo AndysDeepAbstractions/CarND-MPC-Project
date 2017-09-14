@@ -5,7 +5,7 @@ Self-Driving Car Engineer Nanodegree Program
 
 ## The Model
 
-'''
+```
       // Recall the equations for the model:
       // x_[t+1] = x[t] + v[t] * cos(psi[t]) * dt
       // y_[t+1] = y[t] + v[t] * sin(psi[t]) * dt
@@ -13,7 +13,7 @@ Self-Driving Car Engineer Nanodegree Program
       // v_[t+1] = v[t] + a[t] * dt
       // cte[t+1] = f(x[t]) - y[t] + v[t] * sin(epsi[t]) * dt
       // epsi[t+1] = psi[t] - psides[t] + v[t] * delta[t] / Lf * dt
-'''
+```
 
 
 ## Timestep Length and Elapsed Duration (N & dt)
