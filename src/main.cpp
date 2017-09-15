@@ -8,6 +8,9 @@
 #include "Eigen-3.3/Eigen/QR"
 #include "MPC.h"
 #include "json.hpp"
+#include <chrono>  // for high_resolution_clock
+
+using namespace std::chrono;
 
 // for convenience
 using json = nlohmann::json;
@@ -65,6 +68,17 @@ Eigen::VectorXd polyfit(Eigen::VectorXd xvals, Eigen::VectorXd yvals,
   return result;
 }
 
+double px;
+double py;
+double psi;
+double psi_last;
+double v = 1;
+double delta = 1;
+double Lf_inv = 1.6;
+
+auto dt_0 = std::chrono::high_resolution_clock::now();
+auto dt_1 = std::chrono::high_resolution_clock::now();
+
 int main() {
   uWS::Hub h;
 
@@ -77,7 +91,7 @@ int main() {
     // The 4 signifies a websocket message
     // The 2 signifies a websocket event
     string sdata = string(data).substr(0, length);
-    cout << sdata << endl;
+    //cout << sdata << endl;
     if (sdata.size() > 2 && sdata[0] == '4' && sdata[1] == '2') {
       string s = hasData(sdata);
       if (s != "") {
@@ -87,16 +101,27 @@ int main() {
           // j[1] is the data JSON object
           vector<double> ptsx = j[1]["ptsx"];
           vector<double> ptsy = j[1]["ptsy"];
-          double px = j[1]["x"];
-          double py = j[1]["y"];
-          double psi = j[1]["psi"];
+          px = j[1]["x"];
+          py = j[1]["y"];
+          psi_last = psi;
+          psi = j[1]["psi"];
+          v = j[1]["speed"];
+          delta = (j[1]["steering_angle"]);
 
-          double v = j[1]["speed"];
-          double delta = j[1]["steering_angle"];
-          const double Lf = 2.67;
-          const double dt = 0.1;
+          // Measure Time
+          dt_1 = dt_0;
+          dt_0 = std::chrono::high_resolution_clock::now();
+          double dt = std::chrono::duration_cast<std::chrono::nanoseconds>(dt_0 - dt_1).count()/10e9;
+          //std::cout << "s total : " << dt << "s." << std::endl;
 
-          psi -= v * delta / Lf * dt;
+          // Corrections for Model Predictive Control with Latency
+          double Lf_inv = -(psi - psi_last) / (dt * delta * v);
+          std::cout << "Lf_inv : " << Lf_inv << "." << std::endl;
+          /*/if (Lf_inv > 3 || Lf_inv < 2 || isnan(Lf_inv))
+            Lf_inv = 2;
+          std::cout << "Lf_inv : " << Lf_inv << "." << std::endl;
+          //psi += v * delta * Lf_inv * dt;
+           */
 
           /*
           * TODO: Calculate steering angle and throttle using MPC.
@@ -175,7 +200,7 @@ int main() {
 
 
           auto msg = "42[\"steer\"," + msgJson.dump() + "]";
-          std::cout << msg << std::endl;
+          //std::cout << msg << std::endl;
           // Latency
           // The purpose is to mimic real driving conditions where
           // the car does actuate the commands instantly.
