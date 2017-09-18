@@ -31,7 +31,7 @@ const double Lf = 2.67;
 
 // Both the reference cross track and orientation errors are 0.
 // The reference velocity is set to 40 mph.
-double ref_v = 3; // just a initial value
+double ref_v = 4; // just a initial value
 
 // The solver takes all the state variables and actuator
 // variables in a singular vector. Thus, we should to establish
@@ -68,7 +68,8 @@ class FG_eval {
     for (size_t t = 0; t < N; t++) {
       fg[0] += CppAD::pow(vars[cte_start + t], 2);
       fg[0] += .5*CppAD::pow(vars[epsi_start + t], 2);
-      fg[0] += 80*CppAD::pow(vars[v_start + t] - (ref_v / ( 1 + CppAD::pow(vars[cte_start + t], 4))), 2);
+      //fg[0] += 80*(CppAD::pow(vars[v_start + t] - (ref_v) / ( 1 + CppAD::pow(2*vars[cte_start + t], 2))), 2);
+      fg[0] += 80*CppAD::pow(vars[v_start + t] - (ref_v ), 2);
     }
     ref_v +=0.001;
 

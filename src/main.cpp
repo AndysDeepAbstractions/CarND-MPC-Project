@@ -47,8 +47,7 @@ double polyeval(Eigen::VectorXd coeffs, double x) {
 // Fit a polynomial.
 // Adapted from
 // https://github.com/JuliaMath/Polynomials.jl/blob/master/src/Polynomials.jl#L676-L716
-Eigen::VectorXd polyfit(Eigen::VectorXd xvals, Eigen::VectorXd yvals,
-                        int order) {
+Eigen::VectorXd polyfit(Eigen::VectorXd xvals, Eigen::VectorXd yvals,int order) {
   assert(xvals.size() == yvals.size());
   assert(order >= 1 && order <= xvals.size() - 1);
   Eigen::MatrixXd A(xvals.size(), order + 1);
@@ -118,8 +117,9 @@ int main() {
           dt_1 = dt_0;
           dt_0 = std::chrono::high_resolution_clock::now();
           double latency = std::chrono::duration_cast<std::chrono::nanoseconds>(dt_0 - dt_1).count()/10e9;
-          std::cout << "latency : " << latency << "s" << std::endl;
-          latency = 0.15;
+          //std::cout << "latency : " << latency << "s" << std::endl;
+          //latency = max(latency,0.15);
+          latency = 0.1;
 
           // try to find inconsistency
           //double Lf_inv = -(psi - psi_last) / (dt * delta * v);
@@ -159,11 +159,11 @@ int main() {
           double cte = polyeval(coeffs, 0);
           double epsi = -atan(coeffs[1]);
 
-          /*/ Corrections for Model Predictive Control with Latency
+          // Corrections for Model Predictive Control with Latency
 
           //optional to convert miles per hour to meter per second.
           //If you do so, you'll need to convert ref_v too
-          v*=0.44704;
+          //v*=0.44704;
           px = px + v*cos(psi)*latency;
           py = py + v*sin(psi)*latency;
           psi = psi + v*delta*latency/Lf;
