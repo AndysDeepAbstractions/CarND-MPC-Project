@@ -118,8 +118,8 @@ int main() {
           dt_0 = std::chrono::high_resolution_clock::now();
           double latency = std::chrono::duration_cast<std::chrono::nanoseconds>(dt_0 - dt_1).count()/10e9;
           //std::cout << "latency : " << latency << "s" << std::endl;
-          //latency = max(latency,0.15);
-          latency = 0.1;
+          latency = max(latency,0.1);
+          //latency = 0.1;
 
           // try to find inconsistency
           //double Lf_inv = -(psi - psi_last) / (dt * delta * v);
