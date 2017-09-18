@@ -14,8 +14,8 @@ using CppAD::AD;
 // We set the number of timesteps to 25
 // and the timestep evaluation frequency or evaluation
 // period to 0.05.
-size_t N = 25;
-double dt = 0.1;
+size_t N = 15;
+double dt = 0.15;
 
 // This value assumes the model presented in the classroom is used.
 //
@@ -31,7 +31,7 @@ const double Lf = 2.67;
 
 // Both the reference cross track and orientation errors are 0.
 // The reference velocity is set to 40 mph.
-double ref_v = 4.5; // just a initial value
+double ref_v = 3; // just a initial value
 
 // The solver takes all the state variables and actuator
 // variables in a singular vector. Thus, we should to establish
@@ -68,9 +68,9 @@ class FG_eval {
     for (size_t t = 0; t < N; t++) {
       fg[0] += CppAD::pow(vars[cte_start + t], 2);
       fg[0] += .5*CppAD::pow(vars[epsi_start + t], 2);
-      fg[0] += 80*CppAD::pow(vars[v_start + t] - ref_v, 2);
+      fg[0] += 80*CppAD::pow(vars[v_start + t] - (ref_v / ( 1 + CppAD::pow(vars[cte_start + t], 4))), 2);
     }
-    ref_v +=0.0005;
+    ref_v +=0.001;
 
     // Minimize the use of actuators.
     for (size_t t = 0; t < N - 1; t++) {

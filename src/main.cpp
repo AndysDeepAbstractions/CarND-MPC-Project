@@ -110,7 +110,7 @@ int main() {
           v = j[1]["speed"];
           //  change of sign because turning left is negative sign in simulator but positive yaw for MPC
           delta = (j[1]["steering_angle"]);
-          //*delta *= -1;
+          delta *= -1;
           //a = j[1]["throttle_value"];
           //a *= 0.01;
 
