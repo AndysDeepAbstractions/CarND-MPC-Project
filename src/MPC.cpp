@@ -66,12 +66,13 @@ class FG_eval {
 
     // The part of the cost based on the reference state.
     for (size_t t = 0; t < N; t++) {
-      fg[0] += CppAD::pow(vars[cte_start + t], 2);
-      fg[0] += .5*CppAD::pow(vars[epsi_start + t], 2);
-      //fg[0] += 80*(CppAD::pow(vars[v_start + t] - (ref_v) / ( 1 + CppAD::pow(2*vars[cte_start + t], 2))), 2);
+      fg[0] += CppAD::pow(vars[cte_start + t], 4)/(t+1);
+      fg[0] += .5*CppAD::pow(vars[epsi_start + t], 2)/(t+1);
+      //fg[0] += 80*(CppAD::pow(vars[v_start + t] - ref_v) , 2) / ( 1 + CppAD::pow(2*vars[cte_start + t], 2));
       fg[0] += 80*CppAD::pow(vars[v_start + t] - (ref_v ), 2);
     }
-    ref_v +=0.001;
+    ref_v +=0.01;
+    std::cout << "ref_v : " << ref_v << "." << std::endl;
 
     // Minimize the use of actuators.
     for (size_t t = 0; t < N - 1; t++) {
