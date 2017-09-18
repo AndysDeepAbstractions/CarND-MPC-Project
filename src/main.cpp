@@ -74,7 +74,9 @@ double psi;
 double psi_last;
 double v = 1;
 double delta = 1;
-double Lf_inv = 1.6;
+double a;
+
+const double Lf = 2.67;
 
 auto dt_0 = std::chrono::high_resolution_clock::now();
 auto dt_1 = std::chrono::high_resolution_clock::now();
@@ -106,22 +108,27 @@ int main() {
           psi_last = psi;
           psi = j[1]["psi"];
           v = j[1]["speed"];
+          //  change of sign because turning left is negative sign in simulator but positive yaw for MPC
           delta = (j[1]["steering_angle"]);
+          //*delta *= -1;
+          //a = j[1]["throttle_value"];
+          //a *= 0.01;
 
           // Measure Time
           dt_1 = dt_0;
           dt_0 = std::chrono::high_resolution_clock::now();
-          double dt = std::chrono::duration_cast<std::chrono::nanoseconds>(dt_0 - dt_1).count()/10e9;
-          //std::cout << "s total : " << dt << "s." << std::endl;
+          double latency = std::chrono::duration_cast<std::chrono::nanoseconds>(dt_0 - dt_1).count()/10e9;
+          std::cout << "latency : " << latency << "s" << std::endl;
+          latency = 0.15;
 
-          // Corrections for Model Predictive Control with Latency
-          double Lf_inv = -(psi - psi_last) / (dt * delta * v);
-          std::cout << "Lf_inv : " << Lf_inv << "." << std::endl;
-          /*/if (Lf_inv > 3 || Lf_inv < 2 || isnan(Lf_inv))
-            Lf_inv = 2;
-          std::cout << "Lf_inv : " << Lf_inv << "." << std::endl;
+          // try to find inconsistency
+          //double Lf_inv = -(psi - psi_last) / (dt * delta * v);
+          //std::cout << "Lf_inv : " << Lf_inv << "." << std::endl;
+          //if (Lf_inv > 3 || Lf_inv < 2 || isnan(Lf_inv))
+          //  Lf_inv = 2;
+          //std::cout << "Lf_inv : " << Lf_inv << "." << std::endl;
           //psi += v * delta * Lf_inv * dt;
-           */
+          //*/
 
           /*
           * TODO: Calculate steering angle and throttle using MPC.
@@ -151,6 +158,19 @@ int main() {
           auto coeffs = polyfit(waypoints_x_eig, waypoints_y_eig, 3);
           double cte = polyeval(coeffs, 0);
           double epsi = -atan(coeffs[1]);
+
+          /*/ Corrections for Model Predictive Control with Latency
+
+          //optional to convert miles per hour to meter per second.
+          //If you do so, you'll need to convert ref_v too
+          v*=0.44704;
+          px = px + v*cos(psi)*latency;
+          py = py + v*sin(psi)*latency;
+          psi = psi + v*delta*latency/Lf;
+          epsi = epsi + v*delta*latency/Lf;
+          cte= cte+v*sin(epsi)*latency;
+          v = v + a*latency;
+          //*/
 
           Eigen::VectorXd state(6);
           state << 0, 0, 0, v, cte, epsi;
@@ -190,7 +210,7 @@ int main() {
           //.. add (x,y) points to list here, points are in reference to the vehicle's coordinate system
           // the points in the simulator are connected by a Yellow line
 
-          for (double i = 0; i < vars.size(); i += 1){
+          for (double i = 0; i < 2*vars.size(); i += 1){
             next_x_vals.push_back(i);
             next_y_vals.push_back(polyeval(coeffs, i));
           }
